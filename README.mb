@@ -1,4 +1,15 @@
-# MeshDeformer
+# ---------------------------------------------------------------------------- #
+# ------------------------------------------------------------------ HEADER -- #
+:Authors:
+    Maxime Lecompte
+
+:Organization:
+    AdvancePython Class
+
+:Departments:
+    - Rigging
+
+# ---------------------------------------------------------------------------- #
 
 
 An application designed to filter and simplify the use of multiple deformers on a single geometry. The application will be capable of the following:
