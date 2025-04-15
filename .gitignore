@@ -1,5 +1,5 @@
 # ignore this file
-test.py
+#test.py
 
 #ignore ALL .pyc and .log files
 *.pyc
