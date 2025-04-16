@@ -1,19 +1,66 @@
-import sys
-from PySide2 import QtWidgets
-from shiboken2 import wrapInstance
+# ---------------------------------------------------------------------------- #
+# ------------------------------------------------------------------ HEADER -- #
+"""
 
+:Authors:
+    Maxime Lecompte, maxime.lecompte10@gmail.com
+
+:Organization:
+    
+:Departments:
+    - Rigging
+
+:Description:
+    Provides an interface for many common actions related to
+    deformer weight, BlendShape, Wrap, DeltaMush and SkinCluster.
+    Select at least one mesh to display the deformers in the UI.
+
+:How to: (how to execute the core of this module)
+
+:Dependencies:
+    - maya
+    
+
+"""
+
+# ---------------------------------------------------------------------------- #
+# ----------------------------------------------------------------- IMPORTS -- #
+import sys
+
+try:    # older DCC versions
+    from PySide2 import QtWidgets, QtGui, QtUiTools
+    from shiboken2 import wrapInstance
+except: # newer DCC versions
+    from PySide6 import QtWidgets, QtGui, QtUiTools
+    from shiboken6 import wrapInstance
+
+from maya import cmds
 import maya.OpenMayaUI as omui
+
+# ---------------------------------------------------------------------------- #
+# ----------------------------------------------------------------- GLOBALS -- #
+
+# ---------------------------------------------------------------------------- #
+# ----------------------------------------------------------- FUNCTION UTIL -- #
 
 def maya_main_window():
     """
     Return the Maya main window widget as a Python object
     """
     main_window_ptr = omui.MQtUtil.mainWindow()
-    if sys.version_info.major >= 3:
+    if sys.version_info.major >= 3: #check python version
         return wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
     else:
         return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
+    
+# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------- FUNCTIONS -- #
 
+# ---------------------------------------------------------------------------- #
+# ----------------------------------------------------------------- WIDGETS -- #
+
+# ---------------------------------------------------------------------------- #
+# ----------------------------------------------------------------- CLASSES -- #
 
 class SampleUI(QtWidgets.QDialog):
 
@@ -45,6 +92,9 @@ class SampleUI(QtWidgets.QDialog):
     def on_clicked(self):
         print("Button Clicked")
 
+
+# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------- MAIN-- #
 
 if __name__ == "__main__":
 
