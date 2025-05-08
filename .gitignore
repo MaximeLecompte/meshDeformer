@@ -1,0 +1,12 @@
+# ignore this file
+#test.py
+
+#ignore ALL .pyc and .log files
+*.pyc
+*.log
+
+# ignore this directory
+img/_src
+
+# ignore the content of this director (but keep the directory)
+software/maya/plugins/*

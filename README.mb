@@ -1,0 +1,42 @@
+# ---------------------------------------------------------------------------- #
+# ------------------------------------------------------------------ HEADER -- #
+:Authors:
+    Maxime Lecompte
+
+:Organization:
+    AdvancePython Class
+
+:Departments:
+    - Rigging
+
+# ---------------------------------------------------------------------------- #
+
+
+An application designed to filter and simplify the use of multiple deformers on a single geometry. The application will be capable of the following:
+- Filter different types of deformers: Skin, Wrap, DeltaMush, BlendShape
+- Display the list of deformers on a mesh using a Qt Tree Widget, including their respective sub-weights.
+- The sub-weights will be able to be modify depending on the kind of deformer.
+- If the weights are set to default(wrap, blendShape, deltaMush), the text will appear in a neutral color. If the weights are modified, the text will be shown in a noticeable color for better visibility.
+
+Right-clicking on a deformer will display a list of options(wrap, blendShape, deltaMush):
+- Copy
+- Paste
+- Set Value
+- Invert
+- Smooth
+- Clear
+- Check Out Mesh
+- Sync Mesh
+- Check In Mesh
+- Mirror Left to Right
+- Mirror Right to Left
+- Flip
+- Select Vertices >
+- Deselect Vertices >
+
+For skinCluster deformers, the ability to view the influencing joints will be available. Additional right-click options will be provided.
+On the right side of the application, there will be only skinCluster option:
+- Creating skinClusters
+- Adding matrices
+- Importing/exporting weights
+- Create XFO, update XFO remove XFO. 
