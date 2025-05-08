@@ -42,16 +42,27 @@ import maya.OpenMayaUI as omui
 
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------- FUNCTION UTIL -- #
-
 def maya_main_window():
     """
     Return the Maya main window widget as a Python object
     """
     main_window_ptr = omui.MQtUtil.mainWindow()
-    if sys.version_info.major >= 3: #check python version
+    if sys.version_info.major >= 3:
         return wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
     else:
         return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
+
+
+def run():
+    # Close previous instances
+    for widget in QtWidgets.QApplication.topLevelWidgets():
+        if widget.objectName() == MeshDeformerWnd.__name__:
+            widget.close()
+            widget.deleteLater()
+
+    ui = MeshDeformerWnd()
+    ui.show()
+    return ui
     
 # ---------------------------------------------------------------------------- #
 # --------------------------------------------------------------- FUNCTIONS -- #
@@ -62,16 +73,20 @@ def maya_main_window():
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- CLASSES -- #
 
-class SampleUI(QtWidgets.QDialog):
+class MeshDeformerWnd(QtWidgets.QDialog):
 
-    WINDOW_TITLE = "Sample UI"
+    WINDOW_TITLE = "Mesh Deformer"
 
+    @classmethod
+    def windowName(cls):
+        return cls.__name__
 
     def __init__(self, parent=maya_main_window()):
-        super(SampleUI, self).__init__(parent)
+        super(MeshDeformerWnd, self).__init__(parent)
 
         self.setWindowTitle(self.WINDOW_TITLE)
-        self.setMinimumSize(200, 100)
+        self.setObjectName(self.__class__.__name__)
+        self.setMinimumSize(300, 150)
 
         self.create_widgets()
         self.create_layout()
@@ -97,12 +112,4 @@ class SampleUI(QtWidgets.QDialog):
 # --------------------------------------------------------------------- MAIN-- #
 
 if __name__ == "__main__":
-
-    try:
-        sample_ui.close() # pylint: disable=E0601
-        sample_ui.deleteLater()
-    except:
-        pass
-
-    sample_ui = SampleUI()
-    sample_ui.show()
+    run()
