@@ -93,19 +93,21 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.create_connections()
 
     def create_widgets(self):
-        self.apply_button = QtWidgets.QPushButton("Apply")
+        pass
+        # self.apply_button = QtWidgets.QPushButton("Apply")
 
     def create_layout(self):
         main_layout = QtWidgets.QVBoxLayout(self)
         main_layout.setContentsMargins(2, 2, 2, 2)
         main_layout.addStretch()
-        main_layout.addWidget(self.apply_button)
+        # main_layout.addWidget(self.apply_button)
 
     def create_connections(self):
-        self.apply_button.clicked.connect(self.on_clicked)
+        pass
+        # self.apply_button.clicked.connect(self.on_clicked)
 
-    def on_clicked(self):
-        print("Button Clicked")
+    # def on_clicked(self):
+    #     print("Button Clicked")
 
 
 # ---------------------------------------------------------------------------- #
