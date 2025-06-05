@@ -8,7 +8,7 @@
 :Organization:
     
 :Departments:
-    - Rigging
+    - Rigging TD
 
 :Description:
     Provides an interface for many common actions related to
