@@ -8,17 +8,17 @@
 :Organization:
     
 :Departments:
-    - Rigging TD
+    Rigging TD
 
 :Description:
-    Provides an interface for many common actions related to
-    deformer weight, BlendShape, Wrap, DeltaMush and SkinCluster.
-    Select at least one mesh to display the deformers in the UI.
+        This module provides shared utility functions for launching custom Maya UI tools
+        dockable windows (integrated in Maya UI panels)
+        floating windows (independent popup dialogs)
 
 :How to: (how to execute the core of this module)
 
 :Dependencies:
-    - maya
+    maya
     
 
 """
@@ -52,15 +52,48 @@ def maya_main_window():
     else:
         return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
 
-
-def run():
-    # Close previous instances
+def kill_existing_UI(window_name):
     for widget in QtWidgets.QApplication.topLevelWidgets():
-        if widget.objectName() == MeshDeformerWnd.__name__:
+        if widget.objectName() == window_name:
             widget.close()
             widget.deleteLater()
 
-    ui = MeshDeformerWnd()
+
+def run_dockable(UI_class):
+    """
+    Dockable Run
+    """
+    window_name = UI_class.windowName()
+    workspace_name = f"{window_name}WorkspaceControl"
+
+    if cmds.workspaceControl(workspace_name, exists=True):
+        cmds.deleteUI(workspace_name, control=True)
+
+    kill_existing_UI(window_name)
+    ui = UI_class(parent=maya_main_window())
+    ui.setObjectName(window_name)
+    ui.show()
+
+    ptr = omui.MQtUtil.findControl(ui.objectName())
+    if ptr:
+        cmds.workspaceControl(
+            workspace_name,
+            label=UI_class.WINDOW_TITLE,
+            floating=True
+        )
+
+    return ui
+
+
+def run_floating(UI_class):
+    """
+    Floating Run
+    """
+    window_name = UI_class.windowName()
+    kill_existing_UI(window_name)
+
+    ui = UI_class(parent=maya_main_window())
+    ui.setObjectName(window_name)
     ui.show()
     return ui
     
@@ -73,45 +106,6 @@ def run():
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- CLASSES -- #
 
-class MeshDeformerWnd(QtWidgets.QDialog):
-
-    WINDOW_TITLE = "Mesh Deformer"
-
-    @classmethod
-    def windowName(cls):
-        return cls.__name__
-
-    def __init__(self, parent=maya_main_window()):
-        super(MeshDeformerWnd, self).__init__(parent)
-
-        self.setWindowTitle(self.WINDOW_TITLE)
-        self.setObjectName(self.__class__.__name__)
-        self.setMinimumSize(300, 150)
-
-        self.create_widgets()
-        self.create_layout()
-        self.create_connections()
-
-    def create_widgets(self):
-        pass
-        # self.apply_button = QtWidgets.QPushButton("Apply")
-
-    def create_layout(self):
-        main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.setContentsMargins(2, 2, 2, 2)
-        main_layout.addStretch()
-        # main_layout.addWidget(self.apply_button)
-
-    def create_connections(self):
-        pass
-        # self.apply_button.clicked.connect(self.on_clicked)
-
-    # def on_clicked(self):
-    #     print("Button Clicked")
-
-
 # ---------------------------------------------------------------------------- #
 # --------------------------------------------------------------------- MAIN-- #
 
-if __name__ == "__main__":
-    run()
