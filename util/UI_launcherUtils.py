@@ -54,11 +54,7 @@ def maya_main_window():
 
 
 def run_dockable(UI_class):
-    """ Creates the UI.
-
-    :return: The UI instance.
-    :rtype: MeshDeformerWnd.
-    """
+    
     window_name = UI_class.windowName()
     workspace_name = f"{window_name}WorkspaceControl"
     
@@ -86,7 +82,6 @@ def run_dockable(UI_class):
 
 
 def run_floating(UI_class):
-    # Close previous instances
     
     window_name = UI_class.windowName()
     for widget in QtWidgets.QApplication.topLevelWidgets():

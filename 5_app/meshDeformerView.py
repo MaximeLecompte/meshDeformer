@@ -42,27 +42,15 @@ from MeshDeformer.util import UI_launcherUtils
 
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------- FUNCTION UTIL -- #
-# def maya_main_window():
-#     """
-#     Return the Maya main window widget as a Python object
-#     """
-#     main_window_ptr = omui.MQtUtil.mainWindow()
-#     if sys.version_info.major >= 3:
-#         return wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
-#     else:
-#         return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
+def run():
+    """ Creates the UI.
 
-    
-# def run():
-#     # Close previous instances
-#     for widget in QtWidgets.QApplication.topLevelWidgets():
-#         if widget.objectName() == MeshDeformerWnd.__name__:
-#             widget.close()
-#             widget.deleteLater()
+    :return: The UI instance.
+    :rtype: MeshDeformerWnd.
+    """
 
-#     ui = MeshDeformerWnd()
-#     ui.show()
-#     return ui
+    mdw = UI_launcherUtils.run_floating(MeshDeformerWnd)
+    return mdw
     
 # ---------------------------------------------------------------------------- #
 # --------------------------------------------------------------- FUNCTIONS -- #
@@ -121,33 +109,67 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         return jobs
         
 
-    def __init__(self, parent=maya_main_window()):
+    def __init__(self, parent=None):
         super(MeshDeformerWnd, self).__init__(parent)
         
         self.setObjectName(self.windowName())
         self.setWindowTitle(self.WINDOW_TITLE)
         self.setMinimumSize(800, 800)
 
+        self.setup_layout()
         self.create_widgets()
-        self.create_layout()
+        self.buildMainLayout()
         self.create_connections()
+
+    def setup_layout(self):
+        
+        self.main_frame = QtWidgets.QVBoxLayout(self)
+        self.main_frame.setContentsMargins(5, 5, 5, 5)
+        
+        # Create a QWidget to hold the horizontal layout
+        self.main_layout = QtWidgets.QWidget()
+
+        # Create a horizontal layout for side-by-side panels
+        self.content_layout = QtWidgets.QHBoxLayout(self.main_layout)
+        self.content_layout.setContentsMargins(0, 0, 0, 0)
+        self.content_layout.setSpacing(10)
+
+        # --------------------------
+        # Right SIDE:
+        self.rightSide_widget = QtWidgets.QWidget()
+        self.rightSide_layout = QtWidgets.QVBoxLayout(self.rightSide_widget)
+        self.rightSide_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.button_1 = QtWidgets.QPushButton("Option 1")
+        self.rightSide_layout.addWidget(self.button_1)
+        
+        # --------------------------
+        # RIGHT SIDE:
+        self.leftSide_widget = QtWidgets.QWidget()
+        self.leftSide_layout = QtWidgets.QVBoxLayout(self.leftSide_widget)
+        self.leftSide_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.button_2 = QtWidgets.QPushButton("Option 2")
+        self.leftSide_layout.addWidget(self.button_2)
+
+    def buildMainLayout(self):
+        
+        self.main_frame.addWidget(self.main_layout)
+        
+        self.content_layout.addWidget(self.rightSide_widget)
+        self.content_layout.addWidget(self.leftSide_widget)
 
     def create_widgets(self):
         pass
-        # self.apply_button = QtWidgets.QPushButton("Apply")
 
-    def create_layout(self):
-        main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.setContentsMargins(2, 2, 2, 2)
-        main_layout.addStretch()
-        # main_layout.addWidget(self.apply_button)
-
+        
     def create_connections(self):
         pass
-        # self.apply_button.clicked.connect(self.on_clicked)
+
 
     # def on_clicked(self):
     #     print("Button Clicked")
+        
     
     def killAllCallBacks(self):
         return self.killScriptJobs()
@@ -170,6 +192,6 @@ class MeshDeformerWnd(QtWidgets.QDialog):
 # --------------------------------------------------------------------- MAIN-- #
 
 if __name__ == "__main__":
-    # run()
-    UI_launcherUtils.run_floating(MeshDeformerWnd)
+    run()
+
 
