@@ -58,9 +58,41 @@ def run():
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- WIDGETS -- #
 
+class LabeledDivider(QtWidgets.QWidget):
+    def __init__(self, text="Section", color="4A4949", font_size=10):
+        super().__init__()
+        layout = QtWidgets.QHBoxLayout(self)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+
+        line_left = QtWidgets.QFrame()
+        line_left.setFrameShape(QtWidgets.QFrame.HLine)
+        line_left.setFrameShadow(QtWidgets.QFrame.Plain)
+        line_left.setLineWidth(1)
+
+        self.label = QtWidgets.QLabel(text)
+        self.label.setStyleSheet(f"color: {color}; font-size: {font_size}pt; text-decoration: underline;")
+        self.label.setAlignment(QtCore.Qt.AlignCenter)
+
+        line_right = QtWidgets.QFrame()
+        line_right.setFrameShape(QtWidgets.QFrame.HLine)
+        line_right.setFrameShadow(QtWidgets.QFrame.Plain)
+        line_right.setLineWidth(1)
+
+        layout.addWidget(line_left)
+        layout.addWidget(self.label)
+        layout.addWidget(line_right)
+
+    def setText(self, new_text):
+        self.label.setText(new_text)
+
+    def text(self):
+        return self.label.text()
+
 def horizontal_divider():
     """
-    Create a horizontal divider line.
+    Creates a reusable QWidget that looks like:
+    ----------------------
     :return:
     """
     divider = QtWidgets.QFrame()
@@ -181,7 +213,6 @@ class MeshDeformerWnd(QtWidgets.QDialog):
             #Name,                   Margins
             ["BodyCore",             [0,0,0,0]],
             ["TopCore",              [2,0,2,0]],
-            ["MidCore",              [0,0,0,0]],
             ["Right_Layout",         [5,0,5,0]],
             ]
 
@@ -192,10 +223,12 @@ class MeshDeformerWnd(QtWidgets.QDialog):
 
         self.hLayoutAndFunctions = [
             # name,
-            ['Header_Layout01',      [0,0,0,0]],
+            ['Header_Layout01',      [5,0,0,0]],
             ['Header_Layout02',      [40,0,0,0]],
             ['Mid_Layout',           [0,0,0,0]],
-            ['Left_Layout',          [0,0,0,0]],
+            ['Deformer_Layout',          [0,0,0,0]],
+            ['SkinCluster_Layout',          [0,0,0,0]],
+            
             ]
         self.hLayout = {}
         for layoutName, margins in self.hLayoutAndFunctions:
@@ -216,7 +249,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         ##---  Header text and button widget
         self.header_deformer_text = addText("Deformer Visibility :")
         self.header_deformer_text.setStyleSheet("""text-decoration: underline; 
-                                                   color: White; 
+                                                   color: 4A4949; 
                                                    font-size: 10pt"""
                                                    )
         self.header_deformer_text.setAlignment(QtCore.Qt.AlignLeft)    
@@ -251,10 +284,12 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.colorGrey2 = '#4A4949'
 
         self.buttonAndFunctions = [
-            # name,                   function ,        group number,   labelColor,      backgroundColor,                layout,                 layout_coordinate     width   Height
-            ['Option 1',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.vLayout['Right_Layout'],         '0,1,0,0',         125,   ''],
-            ['Option 2',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.vLayout['Right_Layout'],         '0,1,0,0',         125,   ''],
-            ['Option 3',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.vLayout['Right_Layout'],         '0,1,0,0',         125,   ''],
+            # name,                         function ,       group number,   labelColor,      backgroundColor,                layout,                 layout_coordinate     width   Height
+            ['Check Out',                  self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['Deformer_Layout'],         '0,1,0,0',         125,   ''],
+            ['Update',                     self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['Deformer_Layout'],         '0,1,0,0',         125,   ''],
+            ['Check In',                   self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['Deformer_Layout'],         '0,1,0,0',         125,   ''],
+            ['Add SkinCluster',            self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['SkinCluster_Layout'],      '0,1,0,0',         190,   ''],
+            ['Transfer SkinCluster',       self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['SkinCluster_Layout'],      '0,1,0,0',         190,   ''],
             ]
 
         # Build Buttons
@@ -294,7 +329,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         
         self.hLayout["Header_Layout02"].setAlignment(QtCore.Qt.AlignLeft)
         self.vLayout["TopCore"].addSpacing(5)
-        self.vLayout["TopCore"].addWidget(self.divider_widget["Divider_02"])
+        # self.vLayout["TopCore"].addWidget(self.divider_widget["Divider_02"])
         self.vLayout["TopCore"].addSpacing(5)
 
  
@@ -304,6 +339,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.midCore_widget = QtWidgets.QWidget()
         self.midCore_widget.setLayout(self.hLayout["Mid_Layout"])
 
+        # Left container   
         self.left_Qtree_wdg = QtWidgets.QTreeWidget()
         self.left_Qtree_wdg.setHeaderHidden(False)
         self.left_Qtree_wdg.setItemsExpandable(True)
@@ -313,7 +349,21 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         # Right container
         self.right_widget = QtWidgets.QWidget()
         self.right_widget.setLayout(self.vLayout["Right_Layout"])
-        self.right_widget.setStyleSheet("background-color: #4A4949;")
+        self.vLayout["Right_Layout"].addSpacing(5)
+        
+        self.labeled_divider01 = LabeledDivider("Deformer")
+        self.vLayout["Right_Layout"].addWidget(self.labeled_divider01)
+        # self.vLayout["Right_Layout"].addSpacing(5)
+        self.vLayout["Right_Layout"].addLayout(self.hLayout["Deformer_Layout"])
+        self.vLayout["Right_Layout"].addSpacing(15)
+        
+        
+        self.labeled_divider02 = LabeledDivider("SkinCluster")
+        self.vLayout["Right_Layout"].addWidget(self.labeled_divider02)
+        self.vLayout["Right_Layout"].addLayout(self.hLayout['SkinCluster_Layout'])
+
+        
+        self.vLayout["Right_Layout"].addStretch(1)
 
 
         # Add both to the mid layout
