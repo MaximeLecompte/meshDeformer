@@ -70,7 +70,7 @@ def horizontal_divider():
     divider.setMidLineWidth(1)
     return divider
 
-def addText(message, alignement=QtCore.Qt.AlignCenter, height=15, bold=False, color="color: white"):
+def addText(message, alignement=QtCore.Qt.AlignCenter, height=None, bold=False, color="color: white"):
     """
     Create global text management.
     :param message: Text displayed
@@ -84,10 +84,21 @@ def addText(message, alignement=QtCore.Qt.AlignCenter, height=15, bold=False, co
     myFont.setBold(bold)
     text = QtWidgets.QLabel(message)
     text.setAlignment(alignement)
-    text.setFixedHeight(height)
     text.setFont(myFont)
     text.setStyleSheet(color)
+    if height:
+        text.setMinimumHeight(height)
     return text
+    
+def radioButtton(checked=False):    
+    """
+    :param checked: Expect boolean value
+    :return:
+    """
+    radio_button = QtWidgets.QRadioButton()
+    radio_button.setChecked(checked)
+    radio_button.setStyleSheet("QtWidgets.QRadioButton::indicator {width: 60px; height:60px; }")
+    return radio_button
 
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- CLASSES -- #
@@ -150,7 +161,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.base_layout()
         self.create_menu_action()
         self.widgetsAndLayouts()
-        self.create_header_layout_wdg()
+        self.create_Header_Layout01_wdg()
         self.create_mid_layout_wdg()
         self.create_button()
         self.buildMainLayout()
@@ -161,16 +172,17 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         ## -----------------------------
         ## ---  Main frame Layout
         self.main_window = QtWidgets.QVBoxLayout(self)
-        self.main_window.setContentsMargins(3, 8, 3, 8)
+        self.main_window.setContentsMargins(8, 3, 8, 8)
         self.main_window.setSpacing(3)
 
         
     def widgetsAndLayouts(self):
         self.vLayoutAndFunctions = [
             #Name,                   Margins
-            ["BodyCore",           [5,0,5,0]],
-            ["TopCore",            [5,0,5,0]],
-            ["MidCore",            [5,0,5,0]],
+            ["BodyCore",             [0,0,0,0]],
+            ["TopCore",              [2,0,2,0]],
+            ["MidCore",              [0,0,0,0]],
+            ["Right_Layout",         [5,0,5,0]],
             ]
 
         self.vLayout = {}
@@ -180,10 +192,10 @@ class MeshDeformerWnd(QtWidgets.QDialog):
 
         self.hLayoutAndFunctions = [
             # name,
-            ['Header_Layout',      [0,0,0,0]],
-            ['Mid_Layout',         [0,0,0,0]],
-            ['Left_Layout',        [0,0,0,0]],
-            ['Right_Layout',       [0,0,0,0]],
+            ['Header_Layout01',      [0,0,0,0]],
+            ['Header_Layout02',      [40,0,0,0]],
+            ['Mid_Layout',           [0,0,0,0]],
+            ['Left_Layout',          [0,0,0,0]],
             ]
         self.hLayout = {}
         for layoutName, margins in self.hLayoutAndFunctions:
@@ -201,13 +213,27 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.menu_bar_Help.addAction(self.about_action)
         
         ##-----------------------------
-        ##---  Create Left tree widget
-        # self.left_Qtree_wdg = QTreeWidget()
-        # self.left_Qtree_wdg.setHeaderHidden(True)
-        
-        
-        
+        ##---  Header text and button widget
+        self.header_deformer_text = addText("Deformer Visibility :")
+        self.header_deformer_text.setStyleSheet("""text-decoration: underline; 
+                                                   color: White; 
+                                                   font-size: 10pt"""
+                                                   )
+        self.header_deformer_text.setAlignment(QtCore.Qt.AlignLeft)    
+        self.header_widgets = {}
 
+        rows = [
+            ("All :", True),
+            ("SkinCluster :", False),
+            ("BlendShape :", False),
+            ("Wrap :", False),
+            ("Delta Mush :", False),
+        ]
+
+        for name, is_checked in rows:
+            self.label = addText(name)
+            self.btn = radioButtton(checked=is_checked)
+            self.header_widgets[name] = (self.label, self.btn)
 
     def create_button(self):
         """
@@ -226,9 +252,9 @@ class MeshDeformerWnd(QtWidgets.QDialog):
 
         self.buttonAndFunctions = [
             # name,                   function ,        group number,   labelColor,      backgroundColor,                layout,                 layout_coordinate     width   Height
-            ['Option 1',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['Header_Layout'],         '0,1,0,0',         125,   ''],
-            ['Option 2',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['Header_Layout'],           '0,1,0,0',         125,   ''],
-            ['Option 3',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.hLayout['Right_Layout'],          '0,1,0,0',         125,   ''],
+            ['Option 1',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.vLayout['Right_Layout'],         '0,1,0,0',         125,   ''],
+            ['Option 2',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.vLayout['Right_Layout'],         '0,1,0,0',         125,   ''],
+            ['Option 3',              self.temp,             0,      self.colorWhite,    self.colorGrey,      self.vLayout['Right_Layout'],         '0,1,0,0',         125,   ''],
             ]
 
         # Build Buttons
@@ -252,26 +278,31 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         ## Build and customize Buttons
         self.buttons0 = [button for button, _, groupNumber, labColor, bgColor, layout, layout_coord, width, height, in self.buttonAndFunctions if groupNumber == 0] #<--- GroupNumber0 > main button
 
-    def create_header_layout_wdg(self):
+    def create_Header_Layout01_wdg(self):
         
         self.header_widget = QtWidgets.QWidget()
         self.header_widget.setLayout(self.vLayout["TopCore"]) 
-        self.header_widget.setStyleSheet("background-color: #373737;")
-        self.header_widget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
 
         self.vLayout["TopCore"].addWidget(self.divider_widget["Divider_01"])
-        self.vLayout["TopCore"].addLayout(self.hLayout["Header_Layout"])
-        self.vLayout["TopCore"].addSpacing(11)
+        self.vLayout["TopCore"].addLayout(self.hLayout["Header_Layout01"])
+        self.hLayout["Header_Layout01"].addWidget(self.header_deformer_text)
+        self.vLayout["TopCore"].addLayout(self.hLayout["Header_Layout02"])
+        
+        for self.label, self.btn in self.header_widgets.values():
+            self.hLayout["Header_Layout02"].addWidget(self.label)
+            self.hLayout["Header_Layout02"].addWidget(self.btn)
+        
+        self.hLayout["Header_Layout02"].setAlignment(QtCore.Qt.AlignLeft)
+        self.vLayout["TopCore"].addSpacing(5)
+        self.vLayout["TopCore"].addWidget(self.divider_widget["Divider_02"])
+        self.vLayout["TopCore"].addSpacing(5)
+
+ 
   
     def create_mid_layout_wdg(self):
         
         self.midCore_widget = QtWidgets.QWidget()
         self.midCore_widget.setLayout(self.hLayout["Mid_Layout"])
-        
-        # Left container
-        # self.left_widget = QtWidgets.QWidget()
-        # self.left_widget.setLayout(self.hLayout["Left_Layout"])
-        # self.left_widget.setStyleSheet("background-color: #606060;")
 
         self.left_Qtree_wdg = QtWidgets.QTreeWidget()
         self.left_Qtree_wdg.setHeaderHidden(False)
@@ -281,7 +312,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
 
         # Right container
         self.right_widget = QtWidgets.QWidget()
-        self.right_widget.setLayout(self.hLayout["Right_Layout"])
+        self.right_widget.setLayout(self.vLayout["Right_Layout"])
         self.right_widget.setStyleSheet("background-color: #4A4949;")
 
 
@@ -297,6 +328,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         
         self.vLayout["BodyCore"].addWidget(self.header_widget)
         self.vLayout["BodyCore"].addWidget(self.midCore_widget)
+        
 
     def create_menu_action(self):
 
