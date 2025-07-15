@@ -1,0 +1,15 @@
+
+Week02- Coding setStyleSheet
+
+1- In the first assignment arload.py there is long line at the end inside the def fill_meta(self): 
+    - Can we split each operation and name, which will help with debugging?
+
+        timestamp = os.path.getmtime(self.load_file)
+        formatted_date = str(datetime.datetime.fromtimestamp(timestamp)).split(".")[0]
+        self.wgPreview.lblDate.setText(formatted_date)
+
+        file_size = os.path.getsize(self.load_file) / (1024 * 1024.0)
+        formatted_size = "{0:.2f} MB".format(file_size)
+        self.wgPreview.lblSize.setText(formatted_size)
+
+        

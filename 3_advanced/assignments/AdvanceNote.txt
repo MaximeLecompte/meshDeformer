@@ -1,0 +1,41 @@
+
+
+Advanced Python Part 3:
+
+	- Q&A: Update on format picture. Should add new python3 format.
+	
+	Both are container which contain function and variable
+		- Class : - Can create instances or better set objects. > Flexibility, blueprint. All object of the class follow the same blueprint,
+			    but they can be different. 
+			  - Always name a class with a Capital letter. class Light:
+			  - def __init__(self): is necessary, the __init__ will always be triggered when the class is run. Everything we want to run 
+			    by default should be place inside the __init__
+			  - When there is a class with () its mean the class is importing a class parent. ex: class Child(Parent):
+		- Module : Made to create one thing, executing this or that, executing progress...çà
+
+	@property use this over a function to make it like a variable, good when you function only return information
+		@property
+		def myName(self):
+			return foundMyName
+
+	Decorator
+		- They are a wrapper  which allow you to start a process before and after a function execution. A decorator start with a @ ex: @print_process, @undo 
+		- There is also @property, which basically turn a function into a variable. Doesnt work if the function include variable.
+		- @classmethod, converts a function into a class function which is callable without an instance of the class
+		- @staticmethod, is a function defined inside if a class and is callable without instantiating the class first.
+		  The static method is best used when it is independent of the class. ex: BaseTool.log_process()
+
+	args and kwargs
+
+		- *args = allow you to pass multiple arguments to a function
+		- *kwargs = allow you to pass multiple keyword argument to a function
+		- Used when you are not sure how many arguments will actually be delivered when the function is called.
+		- To be use with moderation since it blur the line of readability.
+		- A good way to use it is to unpack a function arguemnt. When using a list or a dictionnary you can use the * in front of the variable name to print all the item in the list or ** in the dictionnary
+
+	generator
+		- Generator are lazy operation. Similar to a list they are not store in memory which makes a significant difference when it come to performance. Big data with big information, generator is the way to go.
+
+	yield
+		- Yield is like a return at the end of a function, except it doesnt not exit the function afterwards. Which mean you can send back a data which keeping the function running.
+
