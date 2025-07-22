@@ -64,7 +64,7 @@ def maya_main_window():
 
 class SampleUI(QtWidgets.QDialog):
 
-    WINDOW_TITLE = "Sample UI"
+    WINDOW_TITLE = "Deformer Interface"
 
 
     def __init__(self, parent=maya_main_window()):
