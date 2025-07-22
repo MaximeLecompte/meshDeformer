@@ -63,6 +63,7 @@ class LabeledDivider(QtWidgets.QWidget):
     """
         A widget that displays a horizontal line with a label in the center.
     """
+    
     def __init__(self, text="Section", color="4A4949", font_size=10):
         super().__init__()
         layout = QtWidgets.QHBoxLayout(self)
