@@ -32,8 +32,9 @@ except: # newer DCC versions
     from PySide6 import QtWidgets, QtGui, QtUiTools, QtCore
     from shiboken6 import wrapInstance
 
-from maya import cmds
 import maya.OpenMayaUI as omui
+from maya import cmds
+
 from MeshDeformer.util import UI_launcherUtils
 
 
@@ -59,6 +60,9 @@ def run():
 # ----------------------------------------------------------------- WIDGETS -- #
 
 class LabeledDivider(QtWidgets.QWidget):
+    """
+        A widget that displays a horizontal line with a label in the center.
+    """
     def __init__(self, text="Section", color="4A4949", font_size=10):
         super().__init__()
         layout = QtWidgets.QHBoxLayout(self)
@@ -91,9 +95,8 @@ class LabeledDivider(QtWidgets.QWidget):
 
 def horizontal_divider():
     """
-    Creates a reusable QWidget that looks like:
-    ----------------------
-    :return:
+        Creates a reusable QWidget that looks like:
+        :return:
     """
     divider = QtWidgets.QFrame()
     divider.setFrameShape(QtWidgets.QFrame.HLine)
@@ -104,13 +107,13 @@ def horizontal_divider():
 
 def addText(message, alignement=QtCore.Qt.AlignCenter, height=None, bold=False, color="color: white"):
     """
-    Create global text management.
-    :param message: Text displayed
-    :param alignement: Alignment, left, right ,center ...
-    :param height: height of text
-    :param bold: expect boolean value
-    :param color: default text color
-    :return:
+        Create global text management.
+        :param message: Text displayed
+        :param alignement: Alignment, left, right ,center ...
+        :param height: height of text
+        :param bold: expect boolean value
+        :param color: default text color
+        :return:
     """
     myFont = QtGui.QFont()
     myFont.setBold(bold)
@@ -122,10 +125,10 @@ def addText(message, alignement=QtCore.Qt.AlignCenter, height=None, bold=False, 
         text.setMinimumHeight(height)
     return text
     
-def radioButtton(checked=False):    
+def radioButton(checked=False):    
     """
-    :param checked: Expect boolean value
-    :return:
+        :param checked: Expect boolean value
+        :return:
     """
     radio_button = QtWidgets.QRadioButton()
     radio_button.setChecked(checked)
@@ -138,7 +141,6 @@ def radioButtton(checked=False):
 class MeshDeformerWnd(QtWidgets.QDialog):
 
     WINDOW_TITLE = "Mesh Deformer"
-    DOCKABLE= True
 
     @classmethod
     def windowName(cls):
@@ -192,28 +194,26 @@ class MeshDeformerWnd(QtWidgets.QDialog):
 
         self.base_layout()
         self.create_menu_action()
-        self.widgetsAndLayouts()
+        self.widgets_and_layouts()
         self.create_Header_Layout01_wdg()
         self.create_mid_layout_wdg()
         self.create_button()
-        self.buildMainLayout()
+        self.build_main_layout()
         self.create_connections()
 
     def base_layout(self):
-        
-        ## -----------------------------
         ## ---  Main frame Layout
         self.main_window = QtWidgets.QVBoxLayout(self)
         self.main_window.setContentsMargins(8, 3, 8, 8)
         self.main_window.setSpacing(3)
 
         
-    def widgetsAndLayouts(self):
+    def widgets_and_layouts(self):
         self.vLayoutAndFunctions = [
-            #Name,                   Margins
-            ["BodyCore",             [0,0,0,0]],
-            ["TopCore",              [2,0,2,0]],
-            ["Right_Layout",         [5,0,5,0]],
+            #Name,                        Margins
+            ["BodyCore",                 [0,0,0,0]],
+            ["TopCore",                  [2,0,2,0]],
+            ["Right_Layout",             [5,0,5,0]],
             ]
 
         self.vLayout = {}
@@ -222,14 +222,14 @@ class MeshDeformerWnd(QtWidgets.QDialog):
             self.vLayout[layoutName].setContentsMargins(*margins)
 
         self.hLayoutAndFunctions = [
-            # name,
-            ['Header_Layout01',      [5,0,0,0]],
-            ['Header_Layout02',      [40,0,0,0]],
-            ['Mid_Layout',           [0,0,0,0]],
+            # name,                       Margins
+            ['Header_Layout01',          [5,0,0,0]],
+            ['Header_Layout02',          [5,0,0,0]],
+            ['Mid_Layout',               [0,0,0,0]],
             ['Deformer_Layout',          [0,0,0,0]],
-            ['SkinCluster_Layout',          [0,0,0,0]],
-            
+            ['SkinCluster_Layout',       [0,0,0,0]],
             ]
+        
         self.hLayout = {}
         for layoutName, margins in self.hLayoutAndFunctions:
             self.hLayout[layoutName] = QtWidgets.QHBoxLayout()
@@ -256,22 +256,22 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.header_widgets = {}
 
         rows = [
-            ("All :", True),
-            ("SkinCluster :", False),
-            ("BlendShape :", False),
-            ("Wrap :", False),
-            ("Delta Mush :", False),
-        ]
+                ("All :", True),
+                ("SkinCluster :", False),
+                ("BlendShape :", False),
+                ("Wrap :", False),
+                ("Delta Mush :", False),
+                ]
 
         for name, is_checked in rows:
             self.label = addText(name)
-            self.btn = radioButtton(checked=is_checked)
+            self.btn = radioButton(checked=is_checked)
             self.header_widgets[name] = (self.label, self.btn)
 
     def create_button(self):
         """
-        Dictionnary of all button
-        :return:
+        Create buttons and assign functions to them.
+        The buttons are grouped by their function and layout.
         """
         self.colorWhite = '#FFFFFF'
         self.colorBlack = '#190707'
@@ -311,7 +311,16 @@ class MeshDeformerWnd(QtWidgets.QDialog):
             layout.addWidget(self.buttons[buttonName]) 
 
         ## Build and customize Buttons
-        self.buttons0 = [button for button, _, groupNumber, labColor, bgColor, layout, layout_coord, width, height, in self.buttonAndFunctions if groupNumber == 0] #<--- GroupNumber0 > main button
+        self.buttons0 = [button for button, 
+                         _, 
+                         groupNumber, 
+                         labColor, 
+                         bgColor, 
+                         layout, 
+                         layout_coord, 
+                         width, 
+                         height, 
+                         in self.buttonAndFunctions if groupNumber == 0] #<--- GroupNumber0 > main button
 
     def create_Header_Layout01_wdg(self):
         
@@ -322,6 +331,8 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.vLayout["TopCore"].addLayout(self.hLayout["Header_Layout01"])
         self.hLayout["Header_Layout01"].addWidget(self.header_deformer_text)
         self.vLayout["TopCore"].addLayout(self.hLayout["Header_Layout02"])
+        self.vLayout["TopCore"].addSpacing(5)
+        self.vLayout["TopCore"].addWidget(self.divider_widget["Divider_02"])
         
         for self.label, self.btn in self.header_widgets.values():
             self.hLayout["Header_Layout02"].addWidget(self.label)
@@ -351,15 +362,15 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.right_widget.setLayout(self.vLayout["Right_Layout"])
         self.vLayout["Right_Layout"].addSpacing(5)
         
-        self.labeled_divider01 = LabeledDivider("Deformer")
-        self.vLayout["Right_Layout"].addWidget(self.labeled_divider01)
+        self.labeled_divider01_wdg = LabeledDivider("Deformer")
+        self.vLayout["Right_Layout"].addWidget(self.labeled_divider01_wdg)
         # self.vLayout["Right_Layout"].addSpacing(5)
         self.vLayout["Right_Layout"].addLayout(self.hLayout["Deformer_Layout"])
         self.vLayout["Right_Layout"].addSpacing(15)
         
         
-        self.labeled_divider02 = LabeledDivider("SkinCluster")
-        self.vLayout["Right_Layout"].addWidget(self.labeled_divider02)
+        self.labeled_divider02_wdg = LabeledDivider("SkinCluster")
+        self.vLayout["Right_Layout"].addWidget(self.labeled_divider02_wdg)
         self.vLayout["Right_Layout"].addLayout(self.hLayout['SkinCluster_Layout'])
 
         
@@ -371,7 +382,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.hLayout["Mid_Layout"].addWidget(self.right_widget)
 
 
-    def buildMainLayout(self):
+    def build_main_layout(self):
         
         self.main_window.addLayout(self.vLayout["BodyCore"])
         self.main_window.setMenuBar(self.menu_bar)
@@ -401,9 +412,12 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         
     #---------- Event Overrides ----------
     def closeEvent(self, event):
-        #Cannot use super because Mayas dockable system wraps my dialog, which can break the super(). 
-        #The wrapped widget is no longer considered a true instance of my class. 
-        #return super(MeshDeformerWnd, self).closeEvent(*args, **kwargs)
+        """
+        Override the close event to ensure all script jobs are killed
+            **Cannot use super because Mayas dockable system wraps my dialog, which can break the super(). 
+              The wrapped widget is no longer considered a true instance of my class. 
+              return super(MeshDeformerWnd, self).closeEvent(*args, **kwargs)**
+        """
         
         self.killAllCallBacks()
         QtWidgets.QDialog.closeEvent(self, event) 
@@ -413,8 +427,11 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         
         
     ##-----------------------------
-    ##---  Help Menu subMenu configuration
+    ##---  Help Menu subMenu configuration 
     def about(self):
+        """
+        To update with final description
+        """
         QtWidgets.QMessageBox.about(self, "About meshDeformer", "Version 1.0 \
                                             \nFunctionality: \
                                             \n      Tool to help manage deformer on a selected mesh")
