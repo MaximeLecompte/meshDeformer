@@ -8,17 +8,17 @@
 :Organization:
     
 :Departments:
-    - Rigging
+    Rigging TD
 
 :Description:
-    Provides an interface for many common actions related to
-    deformer weight, BlendShape, Wrap, DeltaMush and SkinCluster.
-    Select at least one mesh to display the deformers in the UI.
+        This module provides shared utility functions for launching custom Maya UI tools
+        dockable windows (integrated in Maya UI panels)
+        floating windows (independent popup dialogs)
 
 :How to: (how to execute the core of this module)
 
 :Dependencies:
-    - maya
+    maya
     
 
 """
@@ -42,16 +42,57 @@ import maya.OpenMayaUI as omui
 
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------- FUNCTION UTIL -- #
-
 def maya_main_window():
     """
     Return the Maya main window widget as a Python object
     """
     main_window_ptr = omui.MQtUtil.mainWindow()
-    if sys.version_info.major >= 3: #check python version
+    if sys.version_info.major >= 3:
         return wrapInstance(int(main_window_ptr), QtWidgets.QWidget)
     else:
         return wrapInstance(long(main_window_ptr), QtWidgets.QWidget)
+
+
+def run_dockable(UI_class):
+    
+    window_name = UI_class.windowName()
+    workspace_name = f"{window_name}WorkspaceControl"
+    
+    if cmds.workspaceControl(workspace_name, exists=True):
+        cmds.deleteUI(workspace_name, control=True)
+    
+    for widget in QtWidgets.QApplication.topLevelWidgets():
+        if widget.objectName() == window_name:
+            widget.close()
+            widget.deleteLater()
+
+    ui = UI_class(parent=maya_main_window())
+    ui.setObjectName(window_name)
+    
+    ptr = omui.MQtUtil.findControl(ui.objectName())
+    if ptr is not None:
+        cmds.workspaceControl(
+            workspace_name,
+            label=UI_class.WINDOW_TITLE,
+            floating=True,
+        )
+    else:
+        ui.show()
+    return ui
+
+
+def run_floating(UI_class):
+    
+    window_name = UI_class.windowName()
+    for widget in QtWidgets.QApplication.topLevelWidgets():
+        if widget.objectName() == window_name:
+            widget.close()
+            widget.deleteLater()
+
+    ui = UI_class(parent=maya_main_window())
+    ui.setObjectName(window_name)
+    ui.show()
+    return ui
     
 # ---------------------------------------------------------------------------- #
 # --------------------------------------------------------------- FUNCTIONS -- #
@@ -62,47 +103,6 @@ def maya_main_window():
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- CLASSES -- #
 
-class SampleUI(QtWidgets.QDialog):
-
-    WINDOW_TITLE = "Deformer Interface"
-
-
-    def __init__(self, parent=maya_main_window()):
-        super(SampleUI, self).__init__(parent)
-
-        self.setWindowTitle(self.WINDOW_TITLE)
-        self.setMinimumSize(200, 100)
-
-        self.create_widgets()
-        self.create_layout()
-        self.create_connections()
-
-    def create_widgets(self):
-        self.apply_button = QtWidgets.QPushButton("Apply")
-
-    def create_layout(self):
-        main_layout = QtWidgets.QVBoxLayout(self)
-        main_layout.setContentsMargins(2, 2, 2, 2)
-        main_layout.addStretch()
-        main_layout.addWidget(self.apply_button)
-
-    def create_connections(self):
-        self.apply_button.clicked.connect(self.on_clicked)
-
-    def on_clicked(self):
-        print("Button Clicked")
-
-
 # ---------------------------------------------------------------------------- #
 # --------------------------------------------------------------------- MAIN-- #
 
-if __name__ == "__main__":
-
-    try:
-        sample_ui.close() # pylint: disable=E0601
-        sample_ui.deleteLater()
-    except:
-        pass
-
-    sample_ui = SampleUI()
-    sample_ui.show()
