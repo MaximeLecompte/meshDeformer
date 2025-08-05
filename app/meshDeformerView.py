@@ -1,56 +1,56 @@
 # ---------------------------------------------------------------------------- #
 # ------------------------------------------------------------------ HEADER -- #
 """
+Authors   Maxime Lecompte, maxime.lecompte10@gmail.com
+   
+Departments:    Rigging TD
 
-:Authors:
-    Maxime Lecompte, maxime.lecompte10@gmail.com
-
-:Organization:
-    
-:Departments:
-    - Rigging TD
-
-:Description:
+Description
     Provides an interface for many common actions related to
     deformer weight, BlendShape, Wrap, DeltaMush and SkinCluster.
     Select at least one mesh to display the deformers in the UI.
 
-:How to: (how to execute the core of this module)
+How to: (how to execute the core of this module)
 
-:Dependencies:
-    - maya
+Dependencies:  maya
 """
 
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- IMPORTS -- #
-import sys
+import os
 
 try:    # older DCC versions
-    from PySide2 import QtWidgets, QtGui, QtUiTools, QtCore
+    from PySide2 import QtWidgets, QtGui, QtCore
     from shiboken2 import wrapInstance
 except: # newer DCC versions
-    from PySide6 import QtWidgets, QtGui, QtUiTools, QtCore
+    from PySide6 import QtWidgets, QtGui, QtCore
     from shiboken6 import wrapInstance
 
-import maya.OpenMayaUI as omui
 from maya import cmds
+import maya.OpenMayaUI as omui
 
+from MeshDeformer.app import meshDeformer
 from MeshDeformer.util import UI_launcherUtils
 
 
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------------- GLOBALS -- #
 
+ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon")
+
 # ---------------------------------------------------------------------------- #
 # ----------------------------------------------------------- FUNCTION UTIL -- #
+def clear_selection(func):
+    def wrapper(*args, **kwargs):
+        cmds.select(clear=True)
+        return func(*args, **kwargs)
+    
+    return wrapper
+
+@clear_selection
 def run():
-    """ Creates the UI.
-
-    :return: The UI instance.
-    :rtype: MeshDeformerWnd.
-    """
-
     mdw = UI_launcherUtils.run_floating(MeshDeformerWnd)
+
     return mdw
     
 # ---------------------------------------------------------------------------- #
@@ -60,9 +60,8 @@ def run():
 # ----------------------------------------------------------------- WIDGETS -- #
 
 class LabeledDivider(QtWidgets.QWidget):
-    """
-        A widget that displays a horizontal line with a label in the center.
-    """
+    """A widget that displays a horizontal line with a label in the center"""
+
     def __init__(self, text="Section", color="4A4949", font_size=10):
         super().__init__()
         layout = QtWidgets.QHBoxLayout(self)
@@ -94,25 +93,26 @@ class LabeledDivider(QtWidgets.QWidget):
         return self.label.text()
 
 def horizontal_divider():
-    """
-        Creates a reusable QWidget that looks like:
-        :return:
-    """
+    """ Creates a reusable QWidget that looks like """
+
     divider = QtWidgets.QFrame()
     divider.setFrameShape(QtWidgets.QFrame.HLine)
     divider.setFrameShadow(QtWidgets.QFrame.Plain)
     divider.setLineWidth(1)
     divider.setMidLineWidth(1)
+
     return divider
 
 def addText(message, alignement=QtCore.Qt.AlignCenter, height=None, bold=False, color="color: white"):
     """
         Create global text management.
+
         :param message: Text displayed
         :param alignement: Alignment, left, right ,center ...
         :param height: height of text
         :param bold: expect boolean value
         :param color: default text color
+
         :return:
     """
     myFont = QtGui.QFont()
@@ -121,15 +121,15 @@ def addText(message, alignement=QtCore.Qt.AlignCenter, height=None, bold=False, 
     text.setAlignment(alignement)
     text.setFont(myFont)
     text.setStyleSheet(color)
+
     if height:
         text.setMinimumHeight(height)
+
     return text
     
 def radioButton(checked=False):    
-    """
-        :param checked: Expect boolean value
-        :return:
-    """
+    """ param checked: Expect boolean value """
+    
     radio_button = QtWidgets.QRadioButton()
     radio_button.setChecked(checked)
     radio_button.setStyleSheet("QtWidgets.QRadioButton::indicator {width: 60px; height:60px; }")
@@ -139,7 +139,6 @@ def radioButton(checked=False):
 # ----------------------------------------------------------------- CLASSES -- #
 
 class MeshDeformerWnd(QtWidgets.QDialog):
-
     WINDOW_TITLE = "Mesh Deformer"
 
     @classmethod
@@ -200,6 +199,9 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.create_button()
         self.build_main_layout()
         self.create_connections()
+
+        self.populate_tree_with_deformers()
+        self.selection_job = cmds.scriptJob(event=["SelectionChanged", self.on_selection_changed], protected=True)
 
     def base_layout(self):
         ## ---  Main frame Layout
@@ -280,7 +282,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         self.colorLightGrey = '#F2F2F2'
 
         self.colorDarkGrey2 = '#373737'
-        self.colorDarkGrey3 = '#2E2E2E'
+        self.colorDarkGrey3 = "#2E2E2E"
         self.colorGrey2 = '#4A4949'
 
         self.buttonAndFunctions = [
@@ -353,8 +355,16 @@ class MeshDeformerWnd(QtWidgets.QDialog):
         # Left container   
         self.left_Qtree_wdg = QtWidgets.QTreeWidget()
         self.left_Qtree_wdg.setHeaderHidden(False)
+        self.left_Qtree_wdg.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.left_Qtree_wdg.setItemsExpandable(True)
         self.left_Qtree_wdg.setHeaderLabel("Geometries")
+        self.left_Qtree_wdg.setAlternatingRowColors(False)
+        self.left_Qtree_wdg.setStyleSheet("""
+            QTreeWidget {
+                alternate-background-color: #373737;
+            }
+        """)
+
         self.left_Qtree_wdg.setMaximumWidth(400)
 
         # Right container
@@ -406,18 +416,110 @@ class MeshDeformerWnd(QtWidgets.QDialog):
     def temp(self):
         pass
         
-    
+    def populate_tree_with_deformers(self, selection=None):
+        """ Populates the left_Qtree_wdg with the deformers from the current selection,
+            and assigns Maya outliner icons (mesh, nurbsSurface, joint) to the top-level items."""
+        
+        self.left_Qtree_wdg.clear()
+        joint_icon_path = os.path.join(ICON_DIR, "out_joint.png")
+        joint_icon = QtGui.QIcon(joint_icon_path) if os.path.exists(joint_icon_path) else QtGui.QIcon()
+
+        deformer_data = meshDeformer.DeformerUtils.get_deformers_from_selection(selection)
+
+        for obj, deformers in deformer_data.items():
+            # Determine node type from the first shape or the object itself (if joint)
+            shapes = cmds.listRelatives(obj, shapes=True, fullPath=True) or []
+            node_type = None
+
+            if shapes:
+                node_type = cmds.nodeType(shapes[0])
+
+            elif cmds.nodeType(obj) == "joint":
+                node_type = "joint"
+
+            # Try a list of possible icon paths for each node type
+            icon = QtGui.QIcon()
+            icon_paths = []
+
+            if node_type == "mesh":
+                icon_paths = [":/out_mesh.png", ":/mesh.png"]
+
+            elif node_type == "nurbsSurface":
+                icon_paths = [":/out_nurbsSurface.png", ":/nurbsSurface.png"]
+
+
+            for path in icon_paths:
+                test_icon = QtGui.QIcon(path)
+
+                if not test_icon.isNull():
+                    icon = test_icon
+                    break
+
+            if icon.isNull():
+                # Fallback if no icon was found
+                icon = self.style().standardIcon(QtWidgets.QStyle.SP_FileIcon)
+
+            # Create top-level item and assign the icon
+            short_name = obj.split('|')[-1]
+            obj_item = QtWidgets.QTreeWidgetItem([short_name])
+            obj_item.setData(0, QtCore.Qt.UserRole, obj)  # Store full path if needed
+            obj_item.setIcon(0, icon)
+            self.left_Qtree_wdg.addTopLevelItem(obj_item)
+
+            for deformer_type, deformer_list in deformers.items():
+                if not deformer_list:
+                    continue
+
+                deformer_type_item = QtWidgets.QTreeWidgetItem([deformer_type])
+                obj_item.addChild(deformer_type_item)
+
+                for deformer in deformer_list:
+                    # Handle deformer dicts (like blendShape or skinCluster) with details
+                    if isinstance(deformer, dict):
+                        name = deformer.get("name", "Unknown")
+                        deformer_item = QtWidgets.QTreeWidgetItem([name])
+                        deformer_type_item.addChild(deformer_item)
+
+                        if "targets" in deformer:
+                            for target in deformer["targets"]:
+                                target_item = QtWidgets.QTreeWidgetItem([target])
+                                deformer_item.addChild(target_item)
+
+                        if "joints" in deformer:
+                            for joint in deformer["joints"]:
+                                joint_item = QtWidgets.QTreeWidgetItem([joint])
+                                joint_item.setIcon(0, joint_icon)
+                                deformer_item.addChild(joint_item)
+                    else:
+                        deformer_item = QtWidgets.QTreeWidgetItem([str(deformer)])
+                        deformer_type_item.addChild(deformer_item)
+
+            obj_item.setExpanded(True)
+
+    def on_selection_changed(self):
+        """ Called when the Maya selection changes.
+            Only updates the tree if a mesh or nurbsSurface is selected."""
+        self.populate_tree_with_deformers()
+
+
     def killAllCallBacks(self):
         return self.killScriptJobs()
         
     #---------- Event Overrides ----------
     def closeEvent(self, event):
         """
-        Override the close event to ensure all script jobs are killed
+            Override the close event to ensure all script jobs are killed
             **Cannot use super because Mayas dockable system wraps my dialog, which can break the super(). 
               The wrapped widget is no longer considered a true instance of my class. 
               return super(MeshDeformerWnd, self).closeEvent(*args, **kwargs)**
         """
+        if hasattr(self, "selection_job") and self.selection_job:
+            try:
+             cmds.scriptJob(kill=self.selection_job, force=True)
+            except Exception:
+                pass
+
+            self.selection_job = None
         
         self.killAllCallBacks()
         QtWidgets.QDialog.closeEvent(self, event) 
@@ -429,9 +531,7 @@ class MeshDeformerWnd(QtWidgets.QDialog):
     ##-----------------------------
     ##---  Help Menu subMenu configuration 
     def about(self):
-        """
-        To update with final description
-        """
+        """To update with final description"""
         QtWidgets.QMessageBox.about(self, "About meshDeformer", "Version 1.0 \
                                             \nFunctionality: \
                                             \n      Tool to help manage deformer on a selected mesh")

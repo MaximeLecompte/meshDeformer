@@ -84,6 +84,7 @@ cube1.update_transform("rotate", [45.0, 0.0, 90.0])
 cube1.update_transform("scale", [8, 17.5, 25.5])
 
 cube1.color(255, 100, 0)
+cube2.color(200, 100, 0)
 
 # Print status
 cube1.print_status()

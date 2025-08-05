@@ -63,7 +63,7 @@ def long_sleeping(name):
     time.sleep(4)
     print(name)
 
-short_sleeping("nap")
-mid_sleeping("ok sleep")
-long_sleeping("very good sleep")
+short_sleeping("Nap")
+mid_sleeping("OK Sleep")
+long_sleeping("Very Good Sleep")
 
