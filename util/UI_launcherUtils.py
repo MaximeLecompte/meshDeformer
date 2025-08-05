@@ -1,26 +1,18 @@
 # ---------------------------------------------------------------------------- #
 # ------------------------------------------------------------------ HEADER -- #
 """
+Authors:   Maxime Lecompte, maxime.lecompte10@gmail.com
+   
+Departments:    Rigging TD
 
-:Authors:
-    Maxime Lecompte, maxime.lecompte10@gmail.com
-
-:Organization:
-    
-:Departments:
-    Rigging TD
-
-:Description:
+Description:
         This module provides shared utility functions for launching custom Maya UI tools
         dockable windows (integrated in Maya UI panels)
         floating windows (independent popup dialogs)
 
-:How to: (how to execute the core of this module)
+How to: (how to execute the core of this module)
 
-:Dependencies:
-    maya
-    
-
+Dependencies:  maya
 """
 
 # ---------------------------------------------------------------------------- #
@@ -28,20 +20,17 @@
 import sys
 
 try:    # older DCC versions
-    from PySide2 import QtWidgets, QtGui, QtUiTools
+    from PySide2 import QtWidgets
     from shiboken2 import wrapInstance
 except: # newer DCC versions
-    from PySide6 import QtWidgets, QtGui, QtUiTools
+    from PySide6 import QtWidgets
     from shiboken6 import wrapInstance
 
 from maya import cmds
 import maya.OpenMayaUI as omui
 
 # ---------------------------------------------------------------------------- #
-# ----------------------------------------------------------------- GLOBALS -- #
-
-# ---------------------------------------------------------------------------- #
-# ----------------------------------------------------------- FUNCTION UTIL -- #
+# ----------------------------------------------------------- FUNCTION ------- #
 def maya_main_window():
     """
     Return the Maya main window widget as a Python object
@@ -93,16 +82,3 @@ def run_floating(UI_class):
     ui.setObjectName(window_name)
     ui.show()
     return ui
-    
-# ---------------------------------------------------------------------------- #
-# --------------------------------------------------------------- FUNCTIONS -- #
-
-# ---------------------------------------------------------------------------- #
-# ----------------------------------------------------------------- WIDGETS -- #
-
-# ---------------------------------------------------------------------------- #
-# ----------------------------------------------------------------- CLASSES -- #
-
-# ---------------------------------------------------------------------------- #
-# --------------------------------------------------------------------- MAIN-- #
-

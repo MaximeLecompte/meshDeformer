@@ -12,6 +12,7 @@ Advanced Python Part 3:
 			  - def __init__(self): is necessary, the __init__ will always be triggered when the class is run. Everything we want to run 
 			    by default should be place inside the __init__
 			  - When there is a class with () its mean the class is importing a class parent. ex: class Child(Parent):
+			  - 
 		- Module : Made to create one thing, executing this or that, executing progress...çà
 
 	@property use this over a function to make it like a variable, good when you function only return information
@@ -36,6 +37,8 @@ Advanced Python Part 3:
 
 	generator
 		- Generator are lazy operation. Similar to a list they are not store in memory which makes a significant difference when it come to performance. Big data with big information, generator is the way to go.
+		- Calculator as the binary level
+		- Calcule faster with lest space
 		- sum(nr * nr for nr in range(1000000)) finished in 1.9s rather than result=0, for nr in range(1000000): result += nr * nr finished in 3.0s
 
 	yield
