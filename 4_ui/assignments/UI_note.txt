@@ -1,0 +1,15 @@
+
+
+Advanced Python Part 4:
+
+PyQt4 VS PySide2
+    - pyQt is paid, more feature and more advanced -- Its not use in all DCC need to be added
+    - PySide is free, less feature but is very close -- It is use everywhere in all DCC by default
+
+Using only Qt ( from Qt import QtWidgets, QtGui, QtCore) will look at system and use what is available, good for sharing
+    - To use QT the application need to include a Qt.py file somewhere in the python path
+
+Z pattern
+    - A way of reading Left to right, down left to right etc...
+    
+

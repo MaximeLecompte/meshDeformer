@@ -30,7 +30,7 @@ from maya import cmds
 import maya.OpenMayaUI as omui
 
 from MeshDeformer.app import meshDeformer
-from MeshDeformer.util import UI_launcherUtils
+from MeshDeformer.app.util import UI_launcherUtils
 
 
 # ---------------------------------------------------------------------------- #
