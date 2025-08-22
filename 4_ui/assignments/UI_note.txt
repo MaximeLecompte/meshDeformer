@@ -11,5 +11,7 @@ Using only Qt ( from Qt import QtWidgets, QtGui, QtCore) will look at system and
 
 Z pattern
     - A way of reading Left to right, down left to right etc...
+
+1
     
 
